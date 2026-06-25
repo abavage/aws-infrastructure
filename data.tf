@@ -8,8 +8,18 @@ data "aws_ami" "centos" {
   }
 }
 
+data "aws_vpc" "selected" {
+  tags = {
+    Name = "rosa_public"
+  }
+}
+
+data "aws_iam_role" "selected" {
+  name = "ec2-system-manager-instance-role"
+}
+
 data "aws_security_group" "selected" {
   tags = {
-    Name = "linux-ec2-common"
+    Name = "alb-common"
   }
 }

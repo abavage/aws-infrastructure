@@ -1,3 +1,9 @@
+variable "base_name" {
+  type = string
+  nullable = false
+  description = "Common name for all related objectes"
+}
+
 variable "region" {
   type = string
   nullable = false
@@ -36,4 +42,31 @@ variable "ebs_disk" {
     size = ""
     type = ""
   }
+}
+
+variable "instance_count" {
+  type = map(number)
+  description = "Min, max, desired count for the ASG"
+  default = {
+    min = null
+    max = null
+    desired = null
+  }
+}  
+
+
+#variable "common_tags" {
+#  type = map(string)
+#  description =  "Common tags to be added"
+#  default = null
+#}
+
+variable "common_tags" {
+  type = list(object({
+    key                 = string
+    value               = string
+    propagate_at_launch = bool
+  }))
+  description = "Common tags to be added"
+  default     = [] # Changed default to an empty list
 }
