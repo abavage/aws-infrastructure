@@ -1,4 +1,4 @@
-# AWS HTTPD Auto Scaling Stack
+# AWS Auto Scaling Stack
 
 Terraform configuration that provisions a horizontally scalable Apache HTTPD fleet behind an Application Load Balancer (ALB). EC2 instances run in private subnets; the ALB sits in public subnets and uses a shared, pre-existing security group.
 
