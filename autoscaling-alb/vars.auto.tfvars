@@ -13,17 +13,17 @@ public_aws_subnet_ids = [
   "subnet-03d8a0f1e239be33c"
 ]
 
-instance_type = "t3.nano"
+instance_type        = "t3.nano"
 asg_instance_ssh_key = "~/.ssh/one_id_rsa.pub"
-region = "ap-southeast-2"
+region               = "ap-southeast-2"
 ebs_disk = {
   size = 10
   type = "gp3"
 }
 
 instance_count = {
-  min = 1
-  max = 3
+  min     = 1
+  max     = 3
   desired = 1
 }
 

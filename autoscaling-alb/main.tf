@@ -1,5 +1,5 @@
 resource "aws_key_pair" "ssh_key" {
-  key_name   = "httpd_asg_key"
+  key_name = "httpd_asg_key"
   #public_key = file("~/.ssh/one_id_rsa.pub") ec2_linux_bastion_key
   public_key = file(var.asg_instance_ssh_key)
 }
@@ -15,12 +15,12 @@ resource "random_string" "random" {
 resource "aws_launch_template" "httpd_launch_template" {
   name = "${var.base_name}_template"
 
-block_device_mappings {
+  block_device_mappings {
     device_name = "/dev/sda1"
 
     ebs {
-      volume_size = var.ebs_disk.size
-      volume_type = var.ebs_disk.type
+      volume_size           = var.ebs_disk.size
+      volume_type           = var.ebs_disk.type
       delete_on_termination = true
     }
   }
@@ -86,12 +86,12 @@ resource "aws_security_group" "httpd_instance_sg" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "httpd_instance_80_sg" {
-  security_group_id = aws_security_group.httpd_instance_sg.id
+  security_group_id            = aws_security_group.httpd_instance_sg.id
   referenced_security_group_id = data.aws_security_group.selected.id
-  from_port         = 80
-  to_port           = 80
+  from_port                    = 80
+  to_port                      = 80
   #cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "tcp"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "httpd_instance_egress" {
@@ -111,7 +111,7 @@ resource "aws_autoscaling_group" "httpd_autoscaling_group" {
   force_delete              = true
   #placement_group           = aws_placement_group.test.id
   launch_template {
-    id = aws_launch_template.httpd_launch_template.id
+    id      = aws_launch_template.httpd_launch_template.id
     version = aws_launch_template.httpd_launch_template.latest_version
   }
   target_group_arns = [
@@ -121,7 +121,7 @@ resource "aws_autoscaling_group" "httpd_autoscaling_group" {
     strategy = "Rolling"
     preferences {
       min_healthy_percentage = 50
-      skip_matching = true
+      skip_matching          = true
     }
     triggers = [
       "tag"
@@ -154,10 +154,10 @@ resource "aws_autoscaling_group" "httpd_autoscaling_group" {
 
   dynamic "tag" {
     for_each = var.common_tags
-    
+
     content {
-      key = tag.value.key
-      value = tag.value.value
+      key                 = tag.value.key
+      value               = tag.value.value
       propagate_at_launch = tag.value.propagate_at_launch
     }
   }
@@ -165,9 +165,9 @@ resource "aws_autoscaling_group" "httpd_autoscaling_group" {
   timeouts {
     delete = "15m"
   }
-  depends_on = [ 
+  depends_on = [
     aws_launch_template.httpd_launch_template
-   ]
+  ]
 }
 
 
@@ -175,10 +175,10 @@ resource "aws_lb" "httpd_alb" {
   name               = "${var.base_name}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [
+  security_groups = [
     data.aws_security_group.selected.id
   ]
-  subnets            = var.public_aws_subnet_ids
+  subnets = var.public_aws_subnet_ids
 
   enable_deletion_protection = false
 
@@ -189,17 +189,17 @@ resource "aws_lb" "httpd_alb" {
 
 
 resource "aws_lb_target_group" "httpd_target_group" {
-  name        = "${var.base_name}-target-group"
-  target_type = "instance"
-  port        = 80
-  protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.selected.id
+  name                          = "${var.base_name}-target-group"
+  target_type                   = "instance"
+  port                          = 80
+  protocol                      = "HTTP"
+  vpc_id                        = data.aws_vpc.selected.id
   load_balancing_algorithm_type = "round_robin"
   health_check {
-    enabled             = true 
+    enabled             = true
     healthy_threshold   = 3
     interval            = 10
-    matcher             = "200" 
+    matcher             = "200"
     path                = "/index.html"
     port                = "traffic-port"
     protocol            = "HTTP"
@@ -219,9 +219,9 @@ resource "aws_lb_listener" "httpd_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.httpd_target_group.arn
   }
-  depends_on = [ 
+  depends_on = [
     aws_lb_target_group.httpd_target_group
-   ]
+  ]
 }
 
 # Scale out
@@ -248,7 +248,7 @@ resource "aws_cloudwatch_metric_alarm" "httpd_ec2_cloudwatch_metric_alarm_out" {
   }
 
   alarm_description = "Scale out metric monitors ec2 cpu utilization"
-  alarm_actions     = [
+  alarm_actions = [
     aws_autoscaling_policy.httpd_autoscaling_policy_out.arn
   ]
 }
@@ -277,7 +277,7 @@ resource "aws_cloudwatch_metric_alarm" "httpd_ec2_cloudwatch_metric_alarm_in" {
   }
 
   alarm_description = "Scale in metric monitors ec2 cpu utilization"
-  alarm_actions     = [
+  alarm_actions = [
     aws_autoscaling_policy.httpd_autoscaling_policy_in.arn
   ]
 }
