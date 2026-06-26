@@ -129,6 +129,9 @@ resource "aws_autoscaling_group" "httpd_autoscaling_group" {
   }
 
   vpc_zone_identifier = var.private_aws_subnet_ids
+  termination_policies = [
+    "OldestInstance"
+  ]
 
   #instance_maintenance_policy {
   #  min_healthy_percentage = 90
@@ -220,4 +223,63 @@ resource "aws_lb_listener" "httpd_listener" {
     aws_lb_target_group.httpd_target_group
    ]
 }
+
+# Scale out
+resource "aws_autoscaling_policy" "httpd_autoscaling_policy_out" {
+  name                   = "${var.base_name}-autoscaling-policy-out"
+  scaling_adjustment     = 1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = 300
+  autoscaling_group_name = aws_autoscaling_group.httpd_autoscaling_group.name
+}
+
+resource "aws_cloudwatch_metric_alarm" "httpd_ec2_cloudwatch_metric_alarm_out" {
+  alarm_name          = "${var.base_name}-ec2-cloudwatch-metric-alarm-out"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120
+  statistic           = "Average"
+  threshold           = 50
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.httpd_autoscaling_group.name
+  }
+
+  alarm_description = "Scale out metric monitors ec2 cpu utilization"
+  alarm_actions     = [
+    aws_autoscaling_policy.httpd_autoscaling_policy_out.arn
+  ]
+}
+
+# Scale in
+resource "aws_autoscaling_policy" "httpd_autoscaling_policy_in" {
+  name                   = "${var.base_name}-autoscaling-policy-in"
+  scaling_adjustment     = -1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = 300
+  autoscaling_group_name = aws_autoscaling_group.httpd_autoscaling_group.name
+}
+
+resource "aws_cloudwatch_metric_alarm" "httpd_ec2_cloudwatch_metric_alarm_in" {
+  alarm_name          = "${var.base_name}-ec2-cloudwatch-metric-alarm-in"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120
+  statistic           = "Average"
+  threshold           = 20
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.httpd_autoscaling_group.name
+  }
+
+  alarm_description = "Scale in metric monitors ec2 cpu utilization"
+  alarm_actions     = [
+    aws_autoscaling_policy.httpd_autoscaling_policy_in.arn
+  ]
+}
+
 
