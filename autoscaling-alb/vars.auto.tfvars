@@ -23,7 +23,7 @@ ebs_disk = {
 
 instance_count = {
   min     = 1
-  max     = 3
+  max     = 2
   desired = 1
 }
 
