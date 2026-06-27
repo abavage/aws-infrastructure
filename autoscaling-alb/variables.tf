@@ -54,6 +54,11 @@ variable "instance_count" {
   }
 }
 
+variable "alb_common_sg_rules" {
+  type        = map(any)
+  description = "Common ALB SG"
+  default     = null
+}
 
 #variable "common_tags" {
 #  type = map(string)

@@ -1,16 +1,16 @@
 base_name = "httpd"
 
 private_aws_subnet_ids = [
-  "subnet-0bfe86cbbcd1fa9ae",
-  "subnet-0f299d7ac9a805733",
-  "subnet-0b4b836d336ede0f5"
+  "subnet-0dd20c2221265fffc",
+  "subnet-0fe687cbd5bbdfa59",
+  "subnet-00f44e40f34be8ea9"
 ]
 
 
 public_aws_subnet_ids = [
-  "subnet-06be48a11203749d8",
-  "subnet-08fa2afb5d3fbdce9",
-  "subnet-03d8a0f1e239be33c"
+  "subnet-004cde1b63113e642",
+  "subnet-04fb531b8ba20e22c",
+  "subnet-048c2d007336f1d0d"
 ]
 
 instance_type        = "t3.nano"
@@ -32,6 +32,23 @@ instance_count = {
 #  department = "development"
 #  propagate_at_launch = true
 #}
+
+alb_common_sg_rules = {
+  "http" = {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_ipv4   = "0.0.0.0/0"
+    ip_protocol = "tcp"
+  }
+  "https" = {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_ipv4   = "0.0.0.0/0"
+    ip_protocol = "tcp"
+  }
+}
 
 common_tags = [
   {

@@ -30,5 +30,5 @@ output "instance_security_group_id" {
 
 output "alb_security_group_id" {
   description = "Referenced ALB security group (alb-common) — source for instance ingress on port 80."
-  value       = data.aws_security_group.selected.id
+  value       = aws_security_group.httpd_alb_common_sg.id
 }
