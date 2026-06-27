@@ -17,9 +17,3 @@ data "aws_vpc" "selected" {
 data "aws_iam_role" "selected" {
   name = "ec2-system-manager-instance-role"
 }
-
-#data "aws_security_group" "selected" {
-#  tags = {
-#    Name = "alb-common"
-#  }
-#}
